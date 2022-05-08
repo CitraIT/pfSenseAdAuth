@@ -11,6 +11,9 @@ Nas opções avançadas do DNS Resolver, adicionar a linha
 ```
 include: /var/unbound/dnsauth.conf
 ```
+&nbsp;  
+
+Habilitar a autenticação pelo plugin DNS no E2Guardia.
 
 &nbsp;  
 
