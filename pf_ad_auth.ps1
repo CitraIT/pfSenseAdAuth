@@ -1,20 +1,20 @@
 <#
-# Citra IT - Excelência em TI
-# Script para monitorar o eventlog do windows e atualizar o firewall quando um usuario realizar autenticação na rede.
+# Citra IT - Excelence in IT
+# Sample Script to monitor Windows eventlog and update the firewall when a user authenticates in Active Directory.
 # @Author: luciano@citrait.com.br
 # @Version: 1.0
-# @Obs.: Este é um trabalho experimental. Não utilizar em produção.
+# @Obs.: This is a experimental work. Don't use it in production.
 #>
 
 $FIREWALL_IP = "10.0.1.1"
-$FIREWALL_PORT = 8011
+$FIREWALL_PORT = 6544
 
 
-# This Script Path
+# Grab the path this script has been invocated
 $SCRIPT_PATH = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Connecting to EventLog Subsystem
-$EventLog = new-object System.Diagnostics.EventLog "Security"
+$EventLog = New-Object System.Diagnostics.EventLog "Security"
 
 # Register to listen to new written entries in event log
 # Register-ObjectEvent -InputObject $EventLog -EventName EntryWritten -Action {}
@@ -26,15 +26,23 @@ While($event = Wait-Event)
     $entry = $event.SourceEventArgs.Entry
     If($entry.EventID -eq 4768)
     {
+        # EventID 4768 is a successful kerberos user authentication event written to a domain controller when a user logs'on a computer.
+        # This event means a user ticket was granted.
+        # Ref: https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4768
         Write-Host "$(Get-Date): Received a new kerberos auth request (evt id 4768)"
+        
+        # Extract account name from raw log message. why microsoft?? why??
         # Write-Host $entry.Message
         $login = [Regex]::Matches($event.SourceEventArgs.Entry.Message, "Account Name:\s+(.*)`r`n").groups[1].value
+        
         # Check if machine account
         If($login -match ".*\$")
         {
             Write-Host -Fore Yellow "Skipping machine account $login"
             Continue
         }
+        
+        # Extract computer address from raw log message. 
         $ipaddr = [Regex]::Matches($event.SourceEventArgs.Entry.Message, "Client Address:\s+.*((10|192|172)\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})").groups[1].value
         Write-Host -Fore Green "Found User $login on IP $ipaddr"
 
