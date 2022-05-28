@@ -14,13 +14,13 @@ Instalação:
 include: /var/unbound/dnsauth.conf
 ```
 &nbsp;  
-6. Habilitar o E2Guardian
-7. Adicionar regra allow LAN -> This Firewall portas 8080 e 8081 caso usando proxy transparent
-8. Editar o arquivo dnsauth.conf com o conteúdo deste repositório e fazer ajustes necessários
-9. Habilitar de autenticação DNSAuth do E2Guardian
-10. Criar os grupos e usuários através das configurações do E2Guardian
-
-Habilitar a autenticação pelo plugin DNS no E2Guardia.
+6. Habilitar o E2Guardian  
+7. Adicionar regra allow LAN -> This Firewall portas 8080 e 8081 caso usando proxy transparent  
+8. Editar o arquivo dnsauth.conf com o conteúdo deste repositório e fazer ajustes necessários  
+9. Habilitar de autenticação DNSAuth do E2Guardian  
+10. Criar os grupos e usuários através das configurações do E2Guardian  
+  
+Habilitar a autenticação pelo plugin DNS no E2Guardia.  
 
 &nbsp;  
 
