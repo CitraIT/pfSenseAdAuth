@@ -2,9 +2,10 @@
 Este projeto permite a autenticação transparente de usuários do Active Directory com o serviço de WebFilter (Proxy/E2Guardian) do Firewall pfSense.
 
 
-!! Importante: Este procedimento foi homologado para pfSense CE na versão 2.6  
+!! Importante: Este procedimento foi homologado para o pfSense CE na versão 2.6  
 Última atualização: 04/09/2022  
-Responsável: Luciano Rodrigues - luciano@citrait.com.br
+Responsável: Luciano Rodrigues - luciano@citrait.com.br  
+Observação: Este é um projeto tocado por uma pessoa só. Não sou programador, nem administrador de redes, nem analista de segurança, quissá um desenvolvedor *Unix/Python/C#. Toda ajuda é bem vinda, toda contribuição é bem recebida. Este projeto começou como uma idéia boba, mas se materializou como uma possibilidade. Ainda é um MVP - um teste de viabilidade.
 
 
 ## Resumo:  
@@ -14,6 +15,16 @@ A solução é composta de 3 componentes principais:
 1- Do serviço de WebFilter (E2Guardian) instalado e configurado com autenticação DNS.  
 2- Do agente SSO que é instalado no servidor de Active Directory.  
 3- Do serviço instalado no Firewall que faz o meio de campo entre o AD e o WebFilter (e futuramente entre outros serviços como Captive Portal, Regras baseado no login do usuário, entre outros...).  
+
+
+## Observações e Limitações:  
+a) Os grupos serão gerenciados dentro do E2Guardian. Os usuários são do AD, mas você terá que criar os grupos no E2Guardian e gerenciar a associação de usuários e grupos por lá. Futuramente pretendemos fazer a sincronização de grupos com o AD. Patrocina nós que um dia a gente chega lá :D  
+b) Ainda não é possível detectar o logoff de usuários (rotina em desenvolvimento).  
+c) Caso o usuário não seja identificado (pelo agente SSO do AD), o captive portal apenas autenticará usuários locais do firewall.  
+d) Ainda não há interface gráfica para configuração.  
+e) Ainda não é um pacote oficial de fácil instalação...  
+f) A rede interna deve ser 10/8 ou 172.16/12 ou 192.168/16.  
+
 
 
 ## Instalação:
@@ -69,4 +80,113 @@ curl -s -o  /usr/local/www/captive.php https://raw.githubusercontent.com/CitraIT
 5.4- Após as alterações na página que será exibida para o usuário, clique em Save.  
 
 
+6- Ajustar o plugin de autenticação do E2Guardian.  
+6.1- Acesse o menu Diagnostics -> Edit File.  
+6.2- Insira no caminho do arquivo o texto abaixo e clique em Load:  
+```
+/usr/local/etc/e2guardian/authplugins/dnsauth.conf
+```
+6.3- Apague todo o texto e cole o texto abaixo:  
+```
+# IP/DNS-based auth plugin
+#
+# Obtains user and group from domain entry maintained by separate authentication# program.
 
+plugname = 'dnsauth'
+
+# Base domain
+basedomain = "citrait.local"
+
+# Authentication URL
+authurl = "https://192.168.1.1/captive.php?redirurl"
+
+# Prefix for auth URLs
+prefix_auth = "https://192.168.1.1/"
+
+# Redirect to auth (i.e. log-in)
+#  yes - redirects to authurl to login
+#  no - drops through to next auth plugin
+redirect_to_auth = "yes"
+```
+6.4- Substitua citrait.local pelo nome de domínio do firewall (ex.: empresa.corp).  
+6.5- Substitua a authurl pelo endereço/hostname do pfSense, mantendo a URL /captive.php?redirurl.
+6.6- Em prefix_auth ajuste conforme a variável authurl, mas terminando na barra após a porta.  
+6.7- Clique em Save para salvar o arquivo.  
+
+
+
+7- Criar uma CA (Autoridade Certificadora) para usar na interceptação SSL/HTTPS do E2Guardian.   
+7.1- Acesse o menu System -> Cert. Manager, clique em Add.  
+7.2- Dê um nome descritivo para a CA (ex.: CA-E2GUARDIAN).  
+7.3- Marque a caixa "Trust Store".  
+7.4- Em "Common Name" preencha com um nome significativo (ex.: usar o mesmo da descrição).  
+7.5- Preencha as informações organizacionais (country code, state, city...) e clique em Save.
+
+
+
+
+8- Configurar o E2Guardian.  
+8.1- Acesse o menu Services -> E2Guardian Proxy.  
+8.2- Marque a caixa "Enable e2guardian".  
+8.3- Selecione as interfaces LAN e Loopback.  
+8.4- Marque a caixa "Transparent HTTP Proxy".  
+8.5- Marque a opção "Bypass Proxy for Private Address Destination".  
+8.6- Marque a opção "Enable SSL support".  
+8.7- Selecione a CA que criou na etapa acima.  
+8.8- Clique em Save. 
+
+
+9- Habilitar a autenticação no E2Guardian.  
+9.1- Acesso o menu Services -> E2Guardian Proxy -> Guia General.  
+9.2- No campo "Auth Plugins" selecione apenas DNS.  
+9.3- Clique em Save ao final da Página. 
+
+
+
+10- Configurar um usuário e grupo de teste.  
+10.1- Acesso o menu Services -> E2Guardian Proxy -> Guia Groups e clique em Add.  
+10.2- Dê um nome e uma descrição para o grupo (ex.: ti / ti).  
+10.3- Clique em Save ao final da página.  
+10.4- Acesse a aba Users.  
+10.5- No campo com o nome do grupo (ex.: ti) referente ao grupo ti, insira o login do usuário (ex.: luciano, que deve ser um login válido no AD).  
+10.6- Clique em Save ao final da página.  
+10.7- Clique em Apply Changes (botão verde que aparece no topo após salvar a configuração).  
+
+
+11- Instalar o serviço de sincronização no Firewall.  
+11.1- No menu Diagnostics -> Command Prompt, execute os comandos abaixo:
+```
+curl -s -o /usr/local/etc/rc.d/adauth.sh https://raw.githubusercontent.com/CitraIT/pfSenseAdAuth/main/usr/local/etc/rc.d/adauth.sh
+```  
+```
+chmod +x /usr/local/etc/rc.d/adauth.sh
+```  
+```
+curl -s -o /usr/local/sbin/adauth.py https://raw.githubusercontent.com/CitraIT/pfSenseAdAuth/main/usr/local/sbin/adauth.py
+``` 
+```
+chmod +x /usr/local/sbin/adauth.py
+```  
+11.2- Ainda no menu Command Prompt, execute o comando abaixo para inicializar o serviço:  
+```
+service adauth.sh start
+```  
+
+
+12- Instalar o Agente SSO no servidor Active Directory (AD).  
+12.1- No servidor Windows (linux em breve...), certifique-se de ter instalador o DotNet Framework 4.7. Link para download abaixo:  
+```
+https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe
+```
+12.2- Realize o download dos arquivos do serviço SSO pelo link abaixo:  
+```
+https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAuth.zip
+```  
+
+12.3- Descompacte os arquivos no servidor direto no C:\, de maneira que o arquivo pfSenseAdAuth.exe esteja dentro da pasta C:\pfSenseAdAuth\.  
+12.4- Para instalar o serviço do agente, abra um prompt de comandos como Administrador e execute o comando abaixo:  
+``` 
+"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe" C:\pfSenseAdAuth\pfSenseAdAuth.exe  
+``` 
+12.5- Abra o console de serviços, localize o Serviço pfSenseAdAuth e inicialize-o.  
+12.6- Vá para o C:\, deverá aparecer o arquivo 
