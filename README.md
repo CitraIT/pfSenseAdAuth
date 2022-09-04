@@ -9,6 +9,7 @@ Responsável: Luciano Rodrigues - luciano@citrait.com.br
 
 ## Resumo:  
 Este projeto visa permitir que quando os usuários se autentiquem na máquina integrada ao AD, um agente instalado no servidor AD irá realizar a sincronização com o firewall do login/ip deste usúario, de maneira que o serviço de webfilter não precise solicitar o usuário autenticação para registrar seus acessos.  
+  
 A solução é composta de 3 componentes principais:  
 1- Do serviço de WebFilter (E2Guardian) instalado e configurado com autenticação DNS.  
 2- Do agente SSO que é instalado no servidor de Active Directory.  
@@ -53,3 +54,19 @@ https://raw.githubusercontent.com/marcelloc/Unofficial-pfSense-packages/master/U
 pkg update
 ```
 4.10- Acesse o menu System -> Package Manager -> Available Packages e instale o pacote E2Guardian.
+
+
+5- Instale o captive portal customizado.  
+5.1- Execute o comando abaixo no menu Diagnostics -> Command Prompt:  
+```
+curl -s -o  /usr/local/www/captive.php https://raw.githubusercontent.com/CitraIT/pfSenseAdAuth/main/usr/local/www/captive.php
+```
+5.2- Acesse o menu Diagnostics -> Edit File.  
+5.3- No caminho do arquivo insira o caminho abaixo e clique em Load para editar o modelo da tela do Captive Portal. 
+```
+/usr/local/www/captive.php
+```  
+5.4- Após as alterações na página que será exibida para o usuário, clique em Save.  
+
+
+
