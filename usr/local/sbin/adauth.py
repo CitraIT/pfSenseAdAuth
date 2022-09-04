@@ -1,5 +1,13 @@
 #!/usr/local/bin/python3.8
 # -*- coding: utf-8 -*-
+# -------------------------------------------------
+# CITRA IT - EXCELENCIA EM TI
+# Servico de sincronizacao de usuarios
+# @author: luciano@citrait.com.br
+# @date: 03/09/2022
+# @version: 1.0
+# license: use at your own risk
+# -------------------------------------------------
 import os
 import sys
 import signal
@@ -7,9 +15,11 @@ import socket
 import re
 from datetime import datetime
 
+# Socket binding
 SOCK_BIND_ADDR = '0.0.0.0'
 SOCK_BIND_PORT = 6544
 
+# location of log file
 LOG_FILE = '/var/log/adauth.log'
 
 dnsauth_path = '/var/unbound/dnsauth.conf'
@@ -29,6 +39,8 @@ def write_log(line):
     entry = str(timestamp)[:19] + " " + line + "\n"
     log_file.write(entry)
     log_file.close()
+
+
 
 
 
@@ -71,12 +83,11 @@ lines = f.readlines()
 for line in lines:
     line = line.strip()
     if line == '':
-        write_log(f'skipping empty line...')
         continue
     write_log(f'read line {line}')
     matches = re.findall('([0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}).*\sTXT\s"(\w+),(\d+)"', line)
     if not matches:
-        write_log(f'not matches for regex')
+        write_log(f'no matches for regex')
         continue
     ipaddr, user, group = matches[0]
     write_log(f'found user {user} ip {ipaddr} group {group}')
@@ -97,7 +108,11 @@ if __name__ == '__main__':
         sys.exit(0)
 
 
+    # writing pid at startup
+    with open("/var/run/adauth.pid", "w") as pidfile:
+        pidfile.write(str(os.getpid()))
 
+    # starting main loop
     write_log(f'started listening on socket...')
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
