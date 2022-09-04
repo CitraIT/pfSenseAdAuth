@@ -7,17 +7,24 @@ rc_start() {
         #if [ "$ADAUTH_ENABLED}" != "on" ]; then
         #       exit 0
         #elif [ -z "`/bin/ps auxw | /usr/bin/grep "adauth.py " | /usr/bin/awk '{print $2}'`" ]; then
-                /usr/local/sbin/adauth.py
+        echo "starting adauth daemon..."
+        /usr/local/sbin/adauth.py
+        echo "done"
         #fi
 
 }
 
 rc_stop() {
-        /usr/local/sbin/adauth.py -k kill
+        target_pid=$(cat /var/run/adauth.pid)
+        if [ "${target_pid}" == "" ]
+        then
+                echo "no pid found for adauth"
+        else
+                kill $target_pid
+        fi
         # Just to be sure...
         sleep 3
-        /usr/bin/killall -9 adauth.py 2>/dev/null
-        /usr/bin/killall adauth.py 2>/dev/null
+        #ps auxwww | grep -iE adauth | grep -v grep |  awk '{print $2}' | xargs -I@ kill @
 
 }
 
@@ -33,4 +40,3 @@ case $1 in
                 rc_start
                 ;;
 esac
-
