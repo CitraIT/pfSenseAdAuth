@@ -189,4 +189,30 @@ https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAut
 "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe" C:\pfSenseAdAuth\pfSenseAdAuth.exe  
 ``` 
 12.5- Abra o console de serviços, localize o Serviço pfSenseAdAuth e inicialize-o.  
-12.6- Vá para o C:\, deverá aparecer o arquivo 
+
+13- Configurar o Apontamento do Firewall no SSO:  
+13.1- Abra o editor de registro do Windows (regedt32.exe)  
+13.2- Localize a chave: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\pfSenseAdAuth.  
+13.3- Crie uma nova chave: botão direito -> New -> Key (chave) e dê o nome de Parameters.  
+13.4- Clique na chave Parameters com botão direito -> New -> Multi-String Value.  
+13.5- Dê o nome de FirewallList.  
+13.6- Dê um duplo clique na nova chave e insira o ip do firewall, seguido de dois pontos e a porta 6544 como abaixo:  
+```
+192.168.1.1:6544
+```
+
+13.7- Salve o registro e feche o regedit.  
+13.8- Reinicie o serviço pfSenseAdAuth.  
+
+14- Testar  
+14.1- Faça logoff e logon no computador cliente, com uma conta de domínio.  
+
+
+
+
+
+
+
+
+
+
