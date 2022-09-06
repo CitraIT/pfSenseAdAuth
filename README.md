@@ -201,6 +201,9 @@ https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAut
 ```
 192.168.1.1:6544
 ```
+![image](https://user-images.githubusercontent.com/91758384/188525821-e3a82d45-d3a6-467e-afaa-32ff9e2d2b37.png)
+
+
 
 13.7- Salve o registro e feche o regedit.  
 13.8- Reinicie o serviço pfSenseAdAuth.  
@@ -209,8 +212,15 @@ https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAut
 14.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
 14.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
 
+![image](https://user-images.githubusercontent.com/91758384/188525901-df42787f-1ad9-4995-ba71-7d5485e09ae0.png)
 
-15- Seja feliz e me pague uma breja, o Open Source agrade :D 
+Se o computador não estiver no AD, irá ser redirecionado para o Captive Portal:  
+![image](https://user-images.githubusercontent.com/91758384/188526700-30566f40-56a7-4f53-87b9-d7a1746a7b88.png)
+
+
+
+15- Seja feliz e me pague uma breja, o Open Source agrade :D  
+
 
 
 
