@@ -205,7 +205,11 @@ https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAut
 13.8- Reinicie o serviço pfSenseAdAuth.  
 
 14- Testar  
-14.1- Faça logoff e logon no computador cliente, com uma conta de domínio.  
+14.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
+14.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
+
+
+15- Seja feliz e me pague uma breja, o Open Source agrade :D 
 
 
 
