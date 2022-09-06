@@ -219,7 +219,7 @@ Se o computador não estiver no AD, irá ser redirecionado para o Captive Portal
 
 
 
-15- Seja feliz e me pague uma breja, o Open Source agrade :D  
+15- Seja feliz e me pague uma breja, o Open Source agradece :D  
 
 
 
