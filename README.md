@@ -208,9 +208,19 @@ https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAut
 13.7- Salve o registro e feche o regedit.  
 13.8- Reinicie o serviço pfSenseAdAuth.  
 
-14- Testar  
-14.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
-14.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
+
+14- Configurar conexão ldap com o AD  
+14.1- Acesse o menu System -> User Manager -> Authentication Servers  
+14.2- Clique em Add  
+14.3- Em Descriptive Name preencha com pfsense-ad-auth.  
+14.4- Preencha os campos apropriados de acordo com sua conexão do AD.  
+14.5- Dê preferência a conexão LDAP segura (uso de SSL).  
+14.6- Salve a conexão LDAP e teste a autenticação de usuários do AD (menu Diagnostics -> Authentication).  
+
+
+15- Testar  
+15.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
+15.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
 
 ![image](https://user-images.githubusercontent.com/91758384/188525901-df42787f-1ad9-4995-ba71-7d5485e09ae0.png)
 
@@ -219,7 +229,6 @@ Se o computador não estiver no AD, irá ser redirecionado para o Captive Portal
 
 
 
-15- Seja feliz e me pague uma breja, o Open Source agradece :D  
 
 
 
