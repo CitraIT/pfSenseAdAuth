@@ -6,7 +6,7 @@ Este projeto permite a autenticação transparente de usuários do Active Direct
 Última atualização: 04/09/2022  
 Responsável: Luciano Rodrigues - luciano@citrait.com.br  
   
-Observação: Este é um projeto tocado por uma pessoa só. Não sou programador, nem administrador de redes, nem analista de segurança, quissá um desenvolvedor *Unix/Python/C#. Toda ajuda é bem vinda, toda contribuição é bem recebida. Este projeto começou como uma idéia boba, mas se materializou como uma possibilidade. Ainda é um MVP - um teste de viabilidade.
+Observação: Este é um projeto tocado por uma pessoa só. Não sou programador, nem administrador de redes, nem analista de segurança, quissá um desenvolvedor *Unix/Python/C#. Toda ajuda é bem vinda, toda contribuição é bem recebida. Este projeto começou como uma idéia simples, mas se materializou como uma possibilidade. Ainda é um MVP - um teste de viabilidade.
 
 
 ## Resumo:  
