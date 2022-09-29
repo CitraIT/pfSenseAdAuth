@@ -54,7 +54,19 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
         $post_user = strtolower($_POST["user"]);
         $post_pass = $_POST["pass"];
 
-        if(authenticate_user($post_user, $post_pass)) {
+        // setup ldap user source
+        $authcfg = NULL;
+        foreach($config["system"]["authserver"] as $authserver){
+          if($authserver["name"] == "pfsense-ad-auth") {
+              $authcfg = $authserver;
+          }
+        }
+
+        if(!$authcfg){
+          die("no authentication backend configured for pfSenseAdAuth plugin");
+        }
+
+        if(authenticate_user($post_user, $post_pass, $authcfg)) {
                 $AdAuthSocket = fsockopen("127.0.0.1", "6544");
                 fwrite($AdAuthSocket, "$clientip,$post_user");
                 fclose($AdAuthSocket);
@@ -82,7 +94,7 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
                                 <table class="login-out-table">
                                 <tr>
                                         <td colspan="2" style="text-align:center">
-                                                <h1>Citra IT</h1>
+                                                <h1>CITRA IT</h1>
                                                 <h4 style="text-align:center">Authentication Required</h4>
                                         </td>
                                 </tr>
