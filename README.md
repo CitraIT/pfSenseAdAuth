@@ -21,7 +21,7 @@ A solução é composta de 3 componentes principais:
 ## Observações e Limitações:  
 a) Os grupos serão gerenciados dentro do SquidGuard via LDAP como feito de costume.    
 d) Ainda não há interface gráfica para configuração.  
-f) As máquinas que se autenticam no AD deve ter endereços IP que comecem com 192. ou 172. ou 10.    
+f) As máquinas que se autenticam no AD devem ter endereços IP que comece com 192. ou 172. ou 10.    
 
 
 
