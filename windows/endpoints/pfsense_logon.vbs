@@ -28,5 +28,5 @@ objHttp.Option(4) = &H3300
 objHttp.Send
 objHttp.WaitForResponse
 
-wscript.echo "Result: " & objHttp.Status
-wscript.echo "Resp.text: " & objHttp.ResponseText
+Set objHttp = Nothing
+Set objShell = Nothing
