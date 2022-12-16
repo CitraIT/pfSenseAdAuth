@@ -338,8 +338,7 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 	echo "OK";
 }
 ```  
-9.3- Altere o endereço IP pelo IP do servidor AD autorizado a comunicar com o firewall para sincronizar os usuários.  
-9.4- Clique em Save.
+9.3- Clique em Save.
 
 
 
