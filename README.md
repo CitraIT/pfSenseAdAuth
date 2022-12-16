@@ -1,28 +1,22 @@
-# pfSense - Integração de Autenticação Transparente (SSO) com o Active Directory
-Este projeto permite a autenticação transparente de usuários do Active Directory com o serviço de WebFilter (Squid) do Firewall pfSense.
+# pfSense - Integração do WebProxy Squid Transparente com o Active Directory
+Este projeto permite o uso do proxy transparente no pfSense de maneira a registrar os acessos pelo nome do usuário autenticado no computador, sem necessidade de apontar o proxy ou exibir pop-up para o usuário.  
+Entretanto, para máquinas fora do AD ou se houver algum erro na autenticação, será exibido o captive portal para o usuário se autenticar.  
 
 
 !! Importante: Este procedimento foi homologado para o pfSense CE na versão 2.6  
-Última atualização: 19/10/2022  
+Última atualização: 16/12/2022  
 Responsável: Luciano Rodrigues - luciano@citrait.com.br  
   
 !! Importante: O projeto é Open Source e está inteiramente disponível para uso/modificação.    
 
 
 ## Resumo:  
-Este projeto visa permitir que quando os usuários se autentiquem na máquina integrada ao AD, um agente instalado no servidor AD irá realizar a sincronização com o firewall do login/ip deste usúario, de maneira que o serviço de webfilter não precise solicitar o usuário autenticação para registrar seus acessos.  
+Este projeto visa permitir que quando os usuários se autentiquem na máquina integrada ao AD, será executado um script de logon que conecta no firewall e informa o usuário atualmente conectado no computador. Assim através de modificações na autenticação do squid é possível ler o usuário associado ao IP por mais que o proxy este operando de maneira transparente.  
   
 A solução é composta de 3 componentes principais:  
-1- Do Firewall pfSense com o serviço de WebFilter (SQUID).  
-2- Do agente SSO que é instalado no servidor de Active Directory (apenas windows server por enquanto).  
-3- De alguns patches que permitem a devida integração entre os softwares acima.   
-
-
-## Observações e Limitações:  
-a) Os grupos serão gerenciados dentro do SquidGuard via LDAP como feito de costume.    
-d) Ainda não há interface gráfica para configuração.  
-f) As máquinas que se autenticam no AD devem ter endereços IP que comece com 192. ou 172. ou 10.    
-
+1- Do Firewall pfSense com o serviço de WebFilter (Squid).  
+2- Dos scripts de logon/logoff que devem ser configurados em uma GPO.  
+3- Do captive portal usado para autenticar os usuários caso não seja automaticamente reconhecido.   
 
 
 ## Instalação:
@@ -32,7 +26,7 @@ f) As máquinas que se autenticam no AD devem ter endereços IP que comece com 1
 1- Ajustar hostname e nome de domínio do firewall de acordo com o seu ambiente:  
 1.1- A configuração é feita pelo menu System -> General Setup.  
 
-2- Instalar o pacote Squid e SquidGuard:  
+2- Instalar os pacotes Squid e SquidGuard:  
 2.1- Menu System -> Package Manager -> Available Packages -> Squid e SquidGuard:  
 
 
@@ -108,7 +102,7 @@ function squid_check_ip($db, $check_ip) {
 5- Configurar conexão ldap com o AD:   
 5.1- Acesse o menu System -> User Manager -> Authentication Servers  
 5.2- Clique em Add  
-5.3- Em Descriptive Name preencha obrigatoriamente com pfsense-ad-auth.  
+5.3- Em Descriptive Name preencha obrigatoriamente com "pfsense-ad-auth".  
 5.4- Preencha os campos apropriados de acordo com sua conexão do AD.  
 5.5- Dê preferência a conexão LDAP segura (uso de SSL).  
 5.6- Salve a conexão LDAP e teste a autenticação de usuários do AD (menu Diagnostics -> Authentication).  
@@ -326,29 +320,22 @@ function citra_ad_auth_empty_database() {
  */
 require_once("citra_ad_auth.inc");
 
-$EXPLICIT_AD_SERVER = "192.168.1.100";
-$adserver = $_SERVER["REMOTE_ADDR"];
-
-if($adserver != $EXPLICIT_AD_SERVER) {
-	die("This computer is not authorized to sincronize with pfSense AD Auth.");
-}
+$clientip = $_SERVER["REMOTE_ADDR"];
 
 // LOGON
 if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 	$target_user = strtolower($_GET["user"]);
-	$clientip = $_GET["clientip"];
 	if($target_user != NULL && $clientip != NULL){
 		citra_ad_auth_add_database_entry($target_user,$clientip, $source="Domain");
 	}
-	exit(0);
+	echo "OK";
 // LOGOUT
 }else if(isset($_GET["action"]) && $_GET["action"] == "logout"){
 	$target_user = strtolower($_GET["user"]);
-	$clientip = $_GET["clientip"];
 	if($target_user != NULL && $clientip != NULL){
 		citra_ad_auth_del_database_entry($target_user, $clientip);
 	}
-	exit(0);
+	echo "OK";
 }
 ```  
 9.3- Altere o endereço IP pelo IP do servidor AD autorizado a comunicar com o firewall para sincronizar os usuários.  
@@ -356,49 +343,17 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 
 
 
-10- Instalar o Agente SSO no servidor Active Directory (AD).  
-10.1- No servidor Windows (linux em breve...), certifique-se de ter instalador o DotNet Framework 4.7. Link para download abaixo:  
-```
-https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/089f837de42708daacaae7c04b7494db/ndp472-kb4054530-x86-x64-allos-enu.exe
-```
-10.2- Realize o download dos arquivos do serviço SSO pelo link abaixo:  
-```
-https://github.com/CitraIT/pfSenseAdAuth/raw/main/sso_agent/windows/pfSenseAdAuth.zip
-```  
-
-10.3- Descompacte os arquivos no servidor direto no C:\, de maneira que o arquivo pfSenseAdAuth.exe esteja dentro da pasta C:\pfSenseAdAuth\.  
-10.4- Para instalar o serviço do agente, abra um prompt de comandos como Administrador e execute o comando abaixo:  
-``` 
-"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe" C:\pfSenseAdAuth\pfSenseAdAuth.exe  
-``` 
-10.5- Abra o console de serviços, localize o Serviço pfSenseAdAuth, Edite-o e marque como auto-inicializável.
- 
-
-
-11- Configurar o Apontamento do Firewall no SSO:  
-11.1- Abra o editor de registro do Windows (regedt32.exe)  
-11.2- Localize a chave: HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\pfSenseAdAuth.  
-11.3- Crie uma nova chave: botão direito -> New -> Key (chave) e dê o nome de Parameters.  
-11.4- Clique na chave Parameters com botão direito -> New -> Multi-String Value.  
-11.5- Dê o nome de FirewallList.  
-11.6- Dê um duplo clique na nova chave e insira o ip do firewall, seguido de dois pontos e a porta na qual é feito o acesso webConfigurator (normalmente 443 se não tiver sido alterada):  
-```
-192.168.1.1:443
-```
+10- Configurar os scripts de Logon/Logoff.  
+10.1- Baixe os arquivos da pasta windows/endpoints e salve na pasta netlogon da rede.  
+10.2- Edite os scripts e altere o endereço IP do firewall de acordo com seu ambiente.  
+10.3- Crie uma nova política de grupo (ou aproveite uma que já tenha scripts de logon) e atribua os scripts como logon e logoff respectivamente.  
 
 
 
-13.7- Salve o registro e feche o regedit.  
-13.8- Reinicie o serviço pfSenseAdAuth.  
-
-
-
-
-
-15- Testar  
-15.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
-15.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
-15.3- Faça logoff com uma conta local que não exista no domínio e tente navegar. Você deve ser direcionado para o captive portal.
-15.4- Faça autenticação no captive portal para validar que os usuários conseguem autenticar com sucesso.
+11- Testar  
+11.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
+11.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
+11.3- Faça logoff com uma conta local local da máquina e tente navegar. Você deve ser direcionado para o captive portal.
+11.4- Faça autenticação no captive portal para validar que os usuários conseguem autenticar com sucesso.
 
 
