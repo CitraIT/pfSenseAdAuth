@@ -352,7 +352,7 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 11- Testar  
 11.1- Faça logoff e logon novamente no computador cliente (do usuário), com uma conta de domínio.  
 11.2- Tente navegar em algum site. Você deve ser capaz de acessar o site requisitado.  
-11.3- Faça logoff com uma conta local local da máquina e tente navegar. Você deve ser direcionado para o captive portal.
+11.3- Faça logoff com uma conta local local da máquina e tente navegar. Você deve ser direcionado para o captive portal.  
 11.4- Faça autenticação no captive portal para validar que os usuários conseguem autenticar com sucesso.
 
 
