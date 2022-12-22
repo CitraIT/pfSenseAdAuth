@@ -172,6 +172,7 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
 
         // setup ldap user source
         $authcfg = NULL;
+        /*
         foreach($config["system"]["authserver"] as $authserver){
           if($authserver["name"] == "pfsense-ad-auth") {
               $authcfg = $authserver;
@@ -181,13 +182,13 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
         if(!$authcfg){
           die("no authentication backend configured for pfSenseAdAuth plugin");
         }
+        */
         if(authenticate_user($post_user, $post_pass, $authcfg)) {
                 citra_ad_auth_add_database_entry($post_user, $clientip);
-                sleep(3);
-                header("Location: $redirurl");
-                ob_flush();
+                $is_user_authenticated = true;
+                //ob_flush();
         }else{
-                $auth_error_msg = "Invalid username or password";
+                $auth_error_msg = "Login ou senha inválidos";
         }
 
 }
@@ -196,7 +197,7 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
 <!DOCTYPE html>
 <html>
         <head>
-                <title>Autentication</title>
+                <title>Autenticação</title>
                 <style>
                 .center-login{border:2px solid black;margin-left: auto; margin-right: auto; width: 500px; height: 250px;}
                 .login-out-table{;margin-left: auto; margin-right: auto;}
@@ -204,12 +205,17 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
         </head>
         <body>
                 <div class="center-login" >
+<?php
+if($is_user_authenticated){
+   echo "<h1 style='text-align:center'>CITRA IT</h1><div style='text-align:center'>Login bem sucedido. <br><a href='{$redirurl}'>Clique aqui para acessar $redirurl</a></td></tr>";
+} else {
+?>
                         <form method="POST">
                                 <table class="login-out-table">
                                 <tr>
                                         <td colspan="2" style="text-align:center">
                                                 <h1>CITRA IT</h1>
-                                                <h4 style="text-align:center">Authentication Required</h4>
+                                                <h4 style="text-align:center">Identificação Necessária</h4>
                                         </td>
                                 </tr>
                                 <?php
@@ -221,8 +227,9 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
                                 <?php
                                 }
                                 ?>
+
                                 <tr>
-                                        <td colspan="2" ><div><span>Please enter your credentials to continue.</span></div></td>
+                                        <td colspan="2" ><div><span>Faça login para continuar</span></div></td>
                                 </tr>
                                 <tr>
                                         <td>Username</td><td><input type="text" name="user" value=""></td>
@@ -231,13 +238,17 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
                                         <td>Password</td><td><input type="password" name="pass"></td>
                                 </tr>
                                 <tr>
-                                        <td colspan="2"><input type="submit" value="continue"></td>
+                                        <td colspan="2"><input type="submit" value="acessar"></td>
                                 </tr>
                                 <input type="hidden" name="action" value="login">
+
                                 </table>
                         </form>
 
                 </div>
+<?php 
+} 
+?>
         </body>
 
 </html>
@@ -267,6 +278,9 @@ require_once("auth.inc");
 $squid_db_path = "/usr/local/etc/squid/users.db";
 
 
+/*
+Add entry
+*/
 function citra_ad_auth_add_database_entry($user,$ip, $source="CaptivePortal") {
 	//check if already exists
 	exec("/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db \"SELECT ip FROM users WHERE ip='{$ip}'\"", $check_ip);
@@ -281,21 +295,33 @@ function citra_ad_auth_add_database_entry($user,$ip, $source="CaptivePortal") {
 }
 
 
+/*
+Delete entry by full match on user & ip
+*/
 function citra_ad_auth_del_database_entry($user, $ip) {
 	exec("/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db \"DELETE FROM users WHERE username='{$user}' AND ip='{$ip}'\"");
 }
 
 
+/*
+Delete entry by ipaddr
+*/
 function citra_ad_auth_del_database_entry_by_ip($ip) {
 	exec("/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db \"DELETE FROM users WHERE ip='{$ip}'\"");
 }
 
 
+/*
+Delete entry by username
+*/
 function citra_ad_auth_del_database_entry_by_user($user) {
 	exec("/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db \"DELETE FROM users WHERE user='{$user}'\"");
 }
 
 
+/* 
+Truncate whole users table
+*/
 function citra_ad_auth_empty_database() {
 	exec("/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db \"DELETE FROM users\"");
 }
@@ -333,7 +359,7 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 }else if(isset($_GET["action"]) && $_GET["action"] == "logout"){
 	$target_user = strtolower($_GET["user"]);
 	if($target_user != NULL && $clientip != NULL){
-		citra_ad_auth_del_database_entry($target_user, $clientip);
+		citra_ad_auth_del_database_entry_by_ip($clientip);
 	}
 	echo "OK";
 }
