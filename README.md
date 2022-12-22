@@ -185,8 +185,10 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
         */
         if(authenticate_user($post_user, $post_pass, $authcfg)) {
                 citra_ad_auth_add_database_entry($post_user, $clientip);
+                sleep(3);
                 $is_user_authenticated = true;
-                //ob_flush();
+                header("Location: $redirurl");
+                ob_flush();
         }else{
                 $auth_error_msg = "Login ou senha inválidos";
         }
