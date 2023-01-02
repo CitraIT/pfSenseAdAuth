@@ -24,7 +24,16 @@ username = objShell.ExpandEnvironmentStrings("%username%")
 
 objHttp.Open "GET", targetURL & "&action=logon&user=" & username
 objHttp.SetRequestHeader "Content-Type", "application/x-form-www-urlencoded"
-objHttp.Option(4) = &H3300
+
+Const WHR_SslErrorIgnoreFlags = 4
+objHttp.Option(WHR_SslErrorIgnoreFlags) = &h3300
+
+Const WHR_SecureProtocols = 9
+objHttp.Option(WHR_SecureProtocols) = &h0800 + &h0200
+
+Const WHR_EnableCertificateRevocationCheck = 18
+objHttp.Option(WHR_EnableCertificateRevocationCheck) = False
+
 objHttp.Send
 objHttp.WaitForResponse
 
