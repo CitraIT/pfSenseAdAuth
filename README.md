@@ -1,17 +1,16 @@
-# pfSense - Integração do WebProxy Squid Transparente com o Active Directory
-Este projeto permite o uso do proxy transparente no pfSense de maneira a registrar os acessos pelo nome do usuário autenticado no computador, sem necessidade de apontar o proxy ou exibir pop-up para o usuário.  
-Entretanto, para máquinas fora do AD ou se houver algum erro na autenticação, será exibido o captive portal para o usuário se autenticar.  
+# Integração do WebProxy Squid Transparente com o Active Directory no pfSense
+Este projeto facilita a integração do proxy transparente no pfSense, permitindo o registro dos acessos pelo nome do usuário autenticado no Active Directory. Isso é alcançado sem a necessidade de apontar explicitamente o proxy ou exibir pop-ups para o usuário. No entanto, para máquinas que não estão dentro do domínio do Active Directory ou em caso de falha na autenticação, o captive portal será exibido para que o usuário possa se autenticar.
 
 
-!! Importante: Este procedimento foi homologado para o pfSense CE na versão 2.6  
-Última atualização: 16/12/2022  
+!! Importante: Este procedimento foi homologado para o pfSense CE na versão 2.7.2  
+Última atualização: 17/02/2024  
 Responsável: Luciano Rodrigues - luciano@citrait.com.br  
   
-!! Importante: O projeto é Open Source e está inteiramente disponível para uso/modificação.    
+!! Importante: Para suporte enviar um e-mail para comercial@citrait.com.br.  
 
 
-## Resumo:  
-Este projeto visa permitir que quando os usuários se autentiquem na máquina integrada ao AD, será executado um script de logon que conecta no firewall e informa o usuário atualmente conectado no computador. Assim através de modificações na autenticação do squid é possível ler o usuário associado ao IP por mais que o proxy este operando de maneira transparente.  
+## Resumo:
+O objetivo deste projeto é facilitar a conexão entre usuários autenticados em máquinas integradas ao Active Directory (AD) e o firewall. Um script de logon é acionado quando os usuários se autenticam, conectando-se ao firewall e informando o usuário atualmente conectado na máquina. Isso permite que, por meio de modificações na autenticação do Squid, seja possível identificar o usuário associado a um determinado IP, mesmo quando o proxy opera de maneira transparente.
   
 A solução é composta de 3 componentes principais:  
 1- Do Firewall pfSense com o serviço de WebFilter (Squid).  
@@ -60,13 +59,10 @@ require_once("config.inc");
 require_once("globals.inc");
 error_reporting(0);
 global $config, $g;
+
 // stdin loop
-if (!defined(STDIN)) {
-	define("STDIN", fopen("php://stdin", "r"));
-}
-if (!defined(STDOUT)) {
-	define("STDOUT", fopen('php://stdout', 'w'));
-}
+define("STDIN", fopen("php://stdin", "r"));
+define("STDOUT", fopen('php://stdout', 'w'));
 while (!feof(STDIN)) {
 	$check_ip = preg_replace('/[^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}]/', '', fgets(STDIN));
 	$status = '';
