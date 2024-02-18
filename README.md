@@ -413,7 +413,7 @@ url_rewrite_access allow all
 
 b) Definir em cada grupo do squidGuard:  
     Redirect mode: ext url move (Enter URL)  
-    Redirect: https://<ip-do-firewall>/sgerror.php?url=403%20&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u
+    Redirect: https://192.168.1.1/sgerror.php?url=403%20&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u
 
 
     
