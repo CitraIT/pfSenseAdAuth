@@ -389,7 +389,7 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 ```
 12.3- Remover a sessão de um usuário específico através de seu Login:
 ```
-/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db "delete from users where user='luciano'"
+/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db "delete from users where username='luciano'"
 ```
 12.4- Remover a sessão de todos os usuários:
 ```
