@@ -392,3 +392,25 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 /usr/local/bin/sqlite3 /usr/local/etc/squid/users.db "delete from users"
 ```
 
+
+## Outras configurações importantes
+Apesar de não ser obrigatório, talvez você queria também realizar os ajustes abaixo:
+
+a) Nas opções avançadas do squid (custom options before auth), preencher:  
+```
+# Aceita o certificado https do próprio firewall (webgui)
+acl sites_excecao_ssl dstdomain <ip-do-firewall>
+sslproxy_cert_error  allow sites_excecao_ssl
+
+# impede o squidGuard de enviar o redirect http em cima do https.
+url_rewrite_access deny CONNECT
+url_rewrite_access allow all
+```
+
+b) Definir em cada grupo do squidGuard:  
+    Redirect mode: ext url move (Enter URL)  
+    Redirect: https://<ip-do-firewall>/sgerror.php?url=403%20&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u
+
+
+    
+
