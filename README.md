@@ -168,8 +168,8 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
 
         // setup ldap user source
         $authcfg = NULL;
-        /*
         foreach($config["system"]["authserver"] as $authserver){
+          print_r($authserver);
           if($authserver["name"] == "pfsense-ad-auth") {
               $authcfg = $authserver;
           }
@@ -178,7 +178,6 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
         if(!$authcfg){
           die("no authentication backend configured for pfSenseAdAuth plugin");
         }
-        */
         if(authenticate_user($post_user, $post_pass, $authcfg)) {
                 citra_ad_auth_add_database_entry($post_user, $clientip);
                 sleep(3);
@@ -205,7 +204,7 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
                 <div class="center-login" >
 <?php
 if($is_user_authenticated){
-   echo "<h1 style='text-align:center'>CITRA IT</h1><div style='text-align:center'>Login bem sucedido. <br><a href='{$redirurl}'>Clique aqui para acessar $redirurl</a></td></tr>";
+   echo "<h1 style='text-align:center'>CITRA IT</h1><div style='text-align:center'>Login bem sucedido. <br>Você já pode navegar.</td></tr>";
 } else {
 ?>
                         <form method="POST">
