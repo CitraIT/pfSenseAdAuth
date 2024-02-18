@@ -169,7 +169,6 @@ if(isset($_POST["action"]) && $_POST["action"] == "login") {
         // setup ldap user source
         $authcfg = NULL;
         foreach($config["system"]["authserver"] as $authserver){
-          print_r($authserver);
           if($authserver["name"] == "pfsense-ad-auth") {
               $authcfg = $authserver;
           }
@@ -378,4 +377,18 @@ if(isset($_GET["action"]) && $_GET["action"] == "logon") {
 11.3- Faça logoff com uma conta local local da máquina e tente navegar. Você deve ser direcionado para o captive portal.  
 11.4- Faça autenticação no captive portal para validar que os usuários conseguem autenticar com sucesso.
 
+
+12- Consultas Úteis  
+12.1- Listar os usuários atualmente autenticados:
+```
+/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db "select * from users"
+```
+12.2- Remover a sessão de um usuário específico através de seu IP:
+```
+/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db "delete from users where ip='192.168.2.11'"
+```
+12.3- Remover a sessão de todos os usuários:
+```
+/usr/local/bin/sqlite3 /usr/local/etc/squid/users.db "delete from users"
+```
 
