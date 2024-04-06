@@ -406,14 +406,11 @@ a) Nas opções avançadas do squid (custom options before auth), preencher:
 acl sites_excecao_ssl dstdomain <ip-do-firewall>
 sslproxy_cert_error  allow sites_excecao_ssl
 
-# impede o squidGuard de enviar o redirect http em cima do https.
-url_rewrite_access deny CONNECT
-url_rewrite_access allow all
 ```
 
 b) Definir em cada grupo do squidGuard:  
     Redirect mode: ext url move (Enter URL)  
-    Redirect: https://192.168.1.1/sgerror.php?url=403%20&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u
+    redirect: https://192.168.1.1/sgerror.php?url=403%20&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u
 
 
     
